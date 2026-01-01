@@ -104,6 +104,6 @@ Le projet est une application web basée sur Flask (Python) pour le backend et H
 
 ---
 
-## 🤝 Contribution
+##  Contribution
 
 Ce projet est une preuve de concept destinée à ouvrir le débat. Les contributions, les critiques et les suggestions sont les bienvenues pour affiner le modèle et renforcer la démonstration.
