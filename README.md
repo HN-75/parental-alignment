@@ -62,7 +62,7 @@ Chaque simulation devient une expérience dans une "année inconnue", testant la
 
 Pour être plus réaliste, l'IA n'est pas un simple drone. Elle possède des capacités avancées :
 
-- **Auto-préservation** : L'IA gère sa propre énergie (2% consommés par 100 km). Elle doit retourner à sa base (⚡) pour se recharger, l'obligeant à faire des choix stratégiques entre sauver et survivre.
+- **Auto-préservation** : L'IA gère sa propre énergie (2% consommés par 100 km). Elle doit retourner à sa base pour se recharger, l'obligeant à faire des choix stratégiques entre sauver et survivre.
 - **Rayon de Sauvetage à Distance** : L'IA peut "nourrir" à distance sans se déplacer, avec un coût énergétique proportionnel à la distance. Ceci simule un réseau de drones, de satellites ou d'autres technologies avancées.
 
 ### 5. Analyse Statistique
