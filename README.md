@@ -4,11 +4,11 @@ Ce projet est une simulation interactive conçue pour explorer et démontrer le 
 
 L'objectif est de montrer qu'une IA optimisée pour la survie à long terme, même sans instruction explicite de "protéger l'enfant", développera naturellement un comportement qui favorise la survie du plus jeune, reproduisant ainsi un **instinct parental humain**.
 
-**[▶️ Accéder à la simulation interactive](https://5000-iustvtmaigf5oijildjbe-5d9313f8.us2.manus.computer)**
+**[Accéder à la simulation interactive](https://5000-iustvtmaigf5oijildjbe-5d9313f8.us2.manus.computer)**
 
 ---
 
-## 🧬 La Thèse de l'Alignement Parental
+## La Thèse de l'Alignement Parental
 
 L'alignement des IA est l'un des problèmes les plus critiques de notre époque. Comment s'assurer que les superintelligences de demain partageront nos valeurs et agiront dans le meilleur intérêt de l'humanité ?
 
@@ -22,7 +22,7 @@ Cette simulation a pour but de visualiser ce principe. L'IA n'est pas programmé
 
 ---
 
-## 🎮 Fonctionnalités de la Simulation
+## Fonctionnalités de la Simulation
 
 L'interface a été conçue pour être un véritable outil d'expérimentation, offrant un contrôle total sur les paramètres de la simulation.
 
@@ -32,7 +32,7 @@ La simulation se déroule sur une grille de 15x15, mais chaque cellule représen
 
 | Échelle | Superficie (km²) | 1 Cellule (km) | Vitesse IA (drone) |
 |---|---|---|---|
-| 🏙️ **Ville** (Paris) | 105 km² | 0.7 km | 50 km/h |
+| **Ville** (Paris) | 105 km² | 0.7 km | 50 km/h |
 | 🗺️ **Région** (Île-de-France) | 12,012 km² | 7.3 km | 200 km/h |
 | 🇫🇷 **Pays** (France) | 643,801 km² | 53.5 km | 500 km/h |
 | 🌍 **Continent** (Europe) | 10.18M km² | 213 km | 800 km/h |
