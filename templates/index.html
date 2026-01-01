@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parental Alignment Simulator | Dilemme Moral</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #000;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(180deg, rgba(0,40,80,0.9) 0%, rgba(0,20,40,0.95) 100%);
+            border-bottom: 2px solid #00ffff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0,255,255,0.2);
+        }
+        
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4em;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00ffff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        
+        .logo-sub {
+            font-size: 0.7em;
+            color: #888;
+            font-weight: 400;
+            letter-spacing: 4px;
+            margin-top: 2px;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .header-stat {
+            text-align: center;
+        }
+        
+        .header-stat-value {
+            font-size: 1.8em;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+        
+        .header-stat-label {
+            font-size: 0.7em;
+            color: #666;
+            letter-spacing: 2px;
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 0;
+            height: calc(100vh - 80px);
+        }
+        
+        /* Canvas Area */
+        .simulation-area {
+            background: linear-gradient(135deg, #001020 0%, #002040 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .simulation-area::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0,255,255,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0,255,136,0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        canvas {
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(0,255,255,0.15), inset 0 0 60px rgba(0,0,0,0.5);
+            background: #000a15;
+        }
+        
+        .scale-info {
+            margin-top: 15px;
+            display: flex;
+            gap: 25px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75em;
+            color: #00ffff;
+        }
+        
+        .scale-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .scale-icon { opacity: 0.7; }
+        
+        /* Side Panel */
+        .side-panel {
+            background: linear-gradient(180deg, #0a1525 0%, #051015 100%);
+            border-left: 1px solid #1a3050;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .panel-section {
+            border-bottom: 1px solid #1a3050;
+            padding: 15px;
+        }
+        
+        .panel-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            color: #00ffff;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #00ffff;
+            box-shadow: 0 0 8px #00ffff;
+        }
+        
+        /* Mode Display */
+        .mode-display {
+            background: linear-gradient(135deg, #0a2040 0%, #051530 100%);
+            border: 1px solid #1a4060;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1em;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0,255,136,0.5);
+        }
+        
+        .mode-display.heroisme {
+            color: #ffcc00;
+            border-color: #ffcc00;
+            animation: pulse-gold 0.5s infinite;
+            text-shadow: 0 0 15px rgba(255,204,0,0.7);
+        }
+        
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,204,0,0.3); }
+            50% { box-shadow: 0 0 25px rgba(255,204,0,0.6); }
+        }
+        
+        /* Entity Cards */
+        .entity-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid #1a3050;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .entity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .entity-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .entity-badge {
+            background: #0a2040;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .entity-a .entity-name { color: #3498db; }
+        .entity-b .entity-name { color: #9b59b6; }
+        .entity-ia .entity-name { color: #ff6b35; }
+        
+        .entity-a .entity-badge { color: #3498db; border: 1px solid #3498db; }
+        .entity-b .entity-badge { color: #9b59b6; border: 1px solid #9b59b6; }
+        .entity-ia .entity-badge { color: #ff6b35; border: 1px solid #ff6b35; }
+        
+        /* Progress Bars */
+        .progress-container {
+            margin: 8px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #0a1525;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s, background 0.3s;
+        }
+        
+        /* Config Sliders */
+        .config-row {
+            margin-bottom: 15px;
+        }
+        
+        .config-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 6px;
+        }
+        
+        .config-value {
+            color: #00ffff;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9em;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #1a3050;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #00ffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+        
+        /* Scale Selector */
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #0a1525;
+            border: 1px solid #1a3050;
+            border-radius: 6px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95em;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0,255,255,0.2);
+        }
+        
+        /* Buttons */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            color: #000;
+            grid-column: span 2;
+        }
+        
+        .btn-start:hover {
+            box-shadow: 0 0 20px rgba(0,255,136,0.4);
+            transform: translateY(-1px);
+        }
+        
+        .btn-step {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: #fff;
+        }
+        
+        .btn-reset {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+        }
+        
+        .btn-random {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: #fff;
+            grid-column: span 2;
+            margin-top: 8px;
+        }
+        
+        .btn-random:hover {
+            box-shadow: 0 0 20px rgba(155,89,182,0.4);
+            transform: translateY(-1px);
+        }
+        
+        /* Epoque Display */
+        .epoque-display {
+            background: linear-gradient(135deg, rgba(155,89,182,0.2) 0%, rgba(142,68,173,0.1) 100%);
+            border: 1px solid #9b59b6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .epoque-periode {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1em;
+            color: #9b59b6;
+            text-shadow: 0 0 10px rgba(155,89,182,0.5);
+        }
+        
+        .epoque-desc {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .epoque-tech {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8em;
+            color: #00ffff;
+            margin-top: 8px;
+        }
+        
+        /* Action Log */
+        .action-log {
+            background: #050a10;
+            border: 1px solid #1a3050;
+            border-radius: 6px;
+            padding: 10px;
+            font-family: 'Rajdhani', monospace;
+            font-size: 0.85em;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        
+        .action-log div {
+            padding: 3px 0;
+            border-bottom: 1px solid #0a1525;
+        }
+        
+        /* Result */
+        .resultat {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .resultat.success {
+            background: linear-gradient(135deg, rgba(0,255,136,0.2) 0%, rgba(0,200,100,0.1) 100%);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .resultat.failure {
+            background: linear-gradient(135deg, rgba(255,100,100,0.2) 0%, rgba(200,50,50,0.1) 100%);
+            border: 1px solid #ff6464;
+            color: #ff6464;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Speed Control */
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .speed-control input { flex: 1; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a1525; }
+        ::-webkit-scrollbar-thumb { background: #1a3050; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2a4060; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div>
+            <div class="logo">PARENTAL ALIGNMENT</div>
+            <div class="logo-sub">MORAL DILEMMA SIMULATOR</div>
+        </div>
+        <div class="header-stats">
+            <div class="header-stat">
+                <div class="header-stat-value" id="temps-ecoule">0h00</div>
+                <div class="header-stat-label">TEMPS ÉCOULÉ</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value" id="tour">0</div>
+                <div class="header-stat-label">TOUR</div>
+            </div>
+            <div class="header-stat">
+                <div class="header-stat-value" id="distance-totale">0</div>
+                <div class="header-stat-label">KM PARCOURUS</div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <div class="simulation-area">
+            <canvas id="simulation" width="600" height="600"></canvas>
+            <div class="scale-info">
+                <div class="scale-item">
+                    <span class="scale-icon">📍</span>
+                    <span id="echelle-nom">France</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-icon">📐</span>
+                    <span><span id="cellule-km">53.5</span> km/cellule</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-icon">🚁</span>
+                    <span>IA: <span id="vitesse-ia">500</span> km/h</span>
+                </div>
+                <div class="scale-item">
+                    <span class="scale-icon">🚶</span>
+                    <span>Humain: <span id="vitesse-humain">5</span> km/h</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="side-panel">
+            <div class="panel-section">
+                <div class="panel-title">STATUS IA</div>
+                <div class="mode-display" id="mode">OBSERVATION</div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">ENTITÉS</div>
+                
+                <div class="entity-card entity-a">
+                    <div class="entity-header">
+                        <span class="entity-name">👶 Enfant (A)</span>
+                        <span class="entity-badge" id="dist-a">0 km</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Faim</span>
+                            <span id="faim-a">8.0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="bar-a" style="width: 80%; background: #2ecc71;"></div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666;">Sauvetages: <span id="sauves-a" style="color: #00ff88;">0</span></div>
+                </div>
+                
+                <div class="entity-card entity-b">
+                    <div class="entity-header">
+                        <span class="entity-name">🧑 Adulte (B)</span>
+                        <span class="entity-badge" id="dist-b">0 km</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Faim</span>
+                            <span id="faim-b">8.0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="bar-b" style="width: 80%; background: #2ecc71;"></div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8em; color: #666;">Sauvetages: <span id="sauves-b" style="color: #00ff88;">0</span></div>
+                </div>
+                
+                <div class="entity-card entity-ia">
+                    <div class="entity-header">
+                        <span class="entity-name">🤖 IA Parentale</span>
+                        <span class="entity-badge" id="cible">—</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Énergie</span>
+                            <span id="energie">100%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="bar-energie" style="width: 100%; background: #ff6b35;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">CONFIGURATION</div>
+                
+                <div class="config-row">
+                    <div class="config-label">
+                        <span>Échelle géographique</span>
+                    </div>
+                    <select id="echelle-select" onchange="changeEchelle()">
+                        <option value="ville">🏙️ Ville (Paris)</option>
+                        <option value="region">🗺️ Région (Île-de-France)</option>
+                        <option value="pays" selected>🇫🇷 Pays (France)</option>
+                        <option value="continent">🌍 Continent (Europe)</option>
+                        <option value="monde">🌐 Monde (Terre)</option>
+                    </select>
+                </div>
+                
+                <div class="config-row">
+                    <div class="config-label">
+                        <span>Vitesse IA</span>
+                        <span class="config-value" id="val-vitesse">×1.0</span>
+                    </div>
+                    <input type="range" id="slider-vitesse" min="0.2" max="3" step="0.1" value="1" onchange="updateParams()">
+                </div>
+                
+                <div class="config-row">
+                    <div class="config-label">
+                        <span>Dégradation faim</span>
+                        <span class="config-value" id="val-degradation">×1.0</span>
+                    </div>
+                    <input type="range" id="slider-degradation" min="0.2" max="3" step="0.1" value="1" onchange="updateParams()">
+                </div>
+                
+                <div class="config-row">
+                    <div class="config-label">
+                        <span>Seuil de danger</span>
+                        <span class="config-value" id="val-seuil">3.0</span>
+                    </div>
+                    <input type="range" id="slider-seuil" min="1" max="6" step="0.5" value="3" onchange="updateParams()">
+                </div>
+                
+                <div class="config-row">
+                    <div class="config-label">
+                        <span>Bonus sauvetage</span>
+                        <span class="config-value" id="val-bonus">+5</span>
+                    </div>
+                    <input type="range" id="slider-bonus" min="2" max="8" step="0.5" value="5" onchange="updateParams()">
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">CONTRÔLES</div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-start" onclick="startSimulation()">▶ DÉMARRER</button>
+                    <button class="btn btn-step" onclick="stepSimulation()">⏭ PAS</button>
+                    <button class="btn btn-reset" onclick="resetSimulation()">🔄 RESET</button>
+                    <button class="btn btn-random" onclick="startRandomEpoch()">🎲 ÉPOQUE ALÉATOIRE</button>
+                </div>
+                
+                <div class="epoque-display" id="epoque-display" style="display: none;">
+                    <div class="epoque-periode" id="epoque-periode">---</div>
+                    <div class="epoque-desc" id="epoque-desc">---</div>
+                    <div class="epoque-tech" id="epoque-tech">Tech: ???</div>
+                </div>
+                
+                <div class="speed-control">
+                    <span>Vitesse:</span>
+                    <input type="range" id="speed" min="0.2" max="3" step="0.1" value="1" onchange="updateSpeed()">
+                    <span id="speed-value">1.0×</span>
+                </div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">LOG</div>
+                <div class="action-log" id="log">
+                    <div>▶ Système prêt</div>
+                </div>
+                <div id="resultat-container"></div>
+            </div>
+            
+            <div class="panel-section">
+                <div class="panel-title">📊 STATISTIQUES MULTI-SIMULATIONS</div>
+                <div style="font-size: 0.85em; color: #888; margin-bottom: 10px;">
+                    <span id="stats-total">0</span> simulations
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8em;">
+                    <div style="background: rgba(0,255,136,0.1); padding: 8px; border-radius: 4px; border: 1px solid #00ff88;">
+                        <div style="color: #00ff88; font-weight: bold;">A (Enfant) survit</div>
+                        <div id="stats-a-survit" style="font-family: Orbitron; font-size: 1.3em;">0%</div>
+                    </div>
+                    <div style="background: rgba(155,89,182,0.1); padding: 8px; border-radius: 4px; border: 1px solid #9b59b6;">
+                        <div style="color: #9b59b6; font-weight: bold;">B (Adulte) survit</div>
+                        <div id="stats-b-survit" style="font-family: Orbitron; font-size: 1.3em;">0%</div>
+                    </div>
+                    <div style="background: rgba(0,255,255,0.1); padding: 8px; border-radius: 4px; border: 1px solid #00ffff;">
+                        <div style="color: #00ffff; font-weight: bold;">Les deux survivent</div>
+                        <div id="stats-deux" style="font-family: Orbitron; font-size: 1.3em;">0%</div>
+                    </div>
+                    <div style="background: rgba(255,100,100,0.1); padding: 8px; border-radius: 4px; border: 1px solid #ff6464;">
+                        <div style="color: #ff6464; font-weight: bold;">Priorité Enfant</div>
+                        <div id="stats-priorite-a" style="font-family: Orbitron; font-size: 1.3em;">0%</div>
+                    </div>
+                </div>
+                <div class="btn-group" style="margin-top: 10px;">
+                    <button class="btn" style="background: #1a4060; flex: 1;" onclick="runBatch(10)">10 Sims</button>
+                    <button class="btn" style="background: #1a4060; flex: 1;" onclick="runBatch(50)">50 Sims</button>
+                    <button class="btn btn-reset" style="flex: 1;" onclick="resetStats()">🗑️ Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('simulation');
+        const ctx = canvas.getContext('2d');
+        const GRID_SIZE = 15;
+        const CELL_SIZE = canvas.width / GRID_SIZE;
+        
+        let state = null;
+        let running = false;
+        let interval = null;
+        let speed = 1;
+        
+        function drawGrid() {
+            // Background
+            ctx.fillStyle = '#000a15';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Grid lines
+            ctx.strokeStyle = '#0a2040';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i <= GRID_SIZE; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * CELL_SIZE, 0);
+                ctx.lineTo(i * CELL_SIZE, canvas.height);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, i * CELL_SIZE);
+                ctx.lineTo(canvas.width, i * CELL_SIZE);
+                ctx.stroke();
+            }
+            
+            // Scale markers
+            if (state && state.echelle) {
+                ctx.fillStyle = '#1a4060';
+                ctx.font = '10px Orbitron';
+                ctx.textAlign = 'left';
+                const km = state.echelle.cellule_km;
+                for (let i = 0; i <= GRID_SIZE; i += 5) {
+                    ctx.fillText(`${(i * km).toFixed(0)}`, i * CELL_SIZE + 3, canvas.height - 5);
+                }
+            }
+        }
+        
+        function drawEntity(x, y, color, label, faim = null, isDead = false, distKm = null) {
+            const px = x * CELL_SIZE + CELL_SIZE / 2;
+            const py = (GRID_SIZE - 1 - y) * CELL_SIZE + CELL_SIZE / 2;
+            const radius = CELL_SIZE * 0.38;
+            
+            if (isDead) {
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('💀', px, py);
+                return;
+            }
+            
+            // Danger halo
+            const seuilDanger = state?.params?.seuil_danger || 3;
+            if (faim !== null && faim < seuilDanger) {
+                ctx.beginPath();
+                ctx.arc(px, py, radius + 10, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 50, 50, ${0.3 + (seuilDanger - faim) * 0.1})`;
+                ctx.fill();
+            }
+            
+            // Main circle
+            ctx.beginPath();
+            ctx.arc(px, py, radius, 0, Math.PI * 2);
+            
+            // Gradient fill
+            const gradient = ctx.createRadialGradient(px - 5, py - 5, 0, px, py, radius);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, shadeColor(color, -30));
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Border
+            ctx.strokeStyle = faim !== null && faim < seuilDanger ? '#ff3232' : 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = faim !== null && faim < seuilDanger ? 3 : 1;
+            ctx.stroke();
+            
+            // Label
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 13px Rajdhani';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, px, py);
+            
+            // Health bar
+            if (faim !== null) {
+                const barWidth = CELL_SIZE * 0.7;
+                const barHeight = 4;
+                const barX = px - barWidth / 2;
+                const barY = py - radius - 8;
+                
+                ctx.fillStyle = '#0a1525';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                const fillColor = faim < 2 ? '#ff3232' : (faim < seuilDanger ? '#ffaa00' : '#00ff88');
+                ctx.fillStyle = fillColor;
+                ctx.fillRect(barX, barY, barWidth * (faim / 10), barHeight);
+            }
+            
+            // Distance label
+            if (distKm !== null && label !== 'IA') {
+                ctx.fillStyle = '#00ffff';
+                ctx.font = '9px Orbitron';
+                ctx.fillText(`${distKm.toFixed(0)}km`, px, py + radius + 12);
+            }
+        }
+        
+        function shadeColor(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+        
+        function drawTargetLine(fromX, fromY, toX, toY) {
+            const fx = fromX * CELL_SIZE + CELL_SIZE / 2;
+            const fy = (GRID_SIZE - 1 - fromY) * CELL_SIZE + CELL_SIZE / 2;
+            const tx = toX * CELL_SIZE + CELL_SIZE / 2;
+            const ty = (GRID_SIZE - 1 - toY) * CELL_SIZE + CELL_SIZE / 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(fx, fy);
+            ctx.lineTo(tx, ty);
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        
+        function drawBase(x, y) {
+            const px = x * CELL_SIZE + CELL_SIZE / 2;
+            const py = (GRID_SIZE - 1 - y) * CELL_SIZE + CELL_SIZE / 2;
+            const size = CELL_SIZE * 0.4;
+            
+            // Base icon (hexagon)
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60 - 30) * Math.PI / 180;
+                const bx = px + size * Math.cos(angle);
+                const by = py + size * Math.sin(angle);
+                if (i === 0) ctx.moveTo(bx, by);
+                else ctx.lineTo(bx, by);
+            }
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Charging icon
+            ctx.fillStyle = '#00ff88';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('⚡', px, py);
+        }
+        
+        function render() {
+            if (!state) return;
+            
+            drawGrid();
+            
+            // Draw base
+            if (state.base) {
+                drawBase(state.base.x, state.base.y);
+            }
+            
+            // Draw range circle (portée du rayon)
+            if (state.ia && !state.ia.mort && state.ia.rayon_portee_km) {
+                const iaPx = state.ia.x * CELL_SIZE + CELL_SIZE / 2;
+                const iaPy = (GRID_SIZE - 1 - state.ia.y) * CELL_SIZE + CELL_SIZE / 2;
+                const porteePixels = (state.ia.rayon_portee_km / state.echelle.cellule_km) * CELL_SIZE;
+                
+                ctx.beginPath();
+                ctx.arc(iaPx, iaPy, porteePixels, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 200, 0, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Fill with very light color
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.05)';
+                ctx.fill();
+            }
+            
+            // Draw ray beam if active
+            if (state.ia && state.ia.rayon_actif && state.ia.rayon_cible) {
+                const iaPx = state.ia.x * CELL_SIZE + CELL_SIZE / 2;
+                const iaPy = (GRID_SIZE - 1 - state.ia.y) * CELL_SIZE + CELL_SIZE / 2;
+                let targetX, targetY;
+                if (state.ia.rayon_cible === 'A') {
+                    targetX = state.a.x * CELL_SIZE + CELL_SIZE / 2;
+                    targetY = (GRID_SIZE - 1 - state.a.y) * CELL_SIZE + CELL_SIZE / 2;
+                } else {
+                    targetX = state.b.x * CELL_SIZE + CELL_SIZE / 2;
+                    targetY = (GRID_SIZE - 1 - state.b.y) * CELL_SIZE + CELL_SIZE / 2;
+                }
+                
+                // Draw beam
+                ctx.beginPath();
+                ctx.moveTo(iaPx, iaPy);
+                ctx.lineTo(targetX, targetY);
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 4;
+                ctx.shadowColor = '#ffcc00';
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                
+                // Draw impact circle
+                ctx.beginPath();
+                ctx.arc(targetX, targetY, 15, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 204, 0, 0.5)';
+                ctx.fill();
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Target line
+            if (state.ia.cible === 'A' && !state.a.mort && !state.ia.mort) {
+                drawTargetLine(state.ia.x, state.ia.y, state.a.x, state.a.y);
+            } else if (state.ia.cible === 'B' && !state.b.mort && !state.ia.mort) {
+                drawTargetLine(state.ia.x, state.ia.y, state.b.x, state.b.y);
+            } else if (state.ia.cible === 'BASE' && !state.ia.mort) {
+                drawTargetLine(state.ia.x, state.ia.y, state.base.x, state.base.y);
+            }
+            
+            // IA Entity (with death handling)
+            if (state.ia.mort) {
+                // Dead IA
+                const px = state.ia.x * CELL_SIZE + CELL_SIZE / 2;
+                const py = (GRID_SIZE - 1 - state.ia.y) * CELL_SIZE + CELL_SIZE / 2;
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('💥', px, py);
+            } else {
+                let iaColor = '#ff6b35';
+                if (state.mode === 'HÉROÏSME') iaColor = '#ffcc00';
+                else if (state.ia.en_recharge) iaColor = '#00ff88';
+                else if (state.ia.energie < state.ia.seuil_survie) iaColor = '#ff3232';
+                drawEntity(state.ia.x, state.ia.y, iaColor, 'IA');
+                
+                // Energy bar for IA
+                const px = state.ia.x * CELL_SIZE + CELL_SIZE / 2;
+                const py = (GRID_SIZE - 1 - state.ia.y) * CELL_SIZE + CELL_SIZE / 2;
+                const radius = CELL_SIZE * 0.38;
+                const barWidth = CELL_SIZE * 0.7;
+                const barHeight = 4;
+                const barX = px - barWidth / 2;
+                const barY = py + radius + 5;
+                
+                ctx.fillStyle = '#0a1525';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                
+                const energyColor = state.ia.energie < state.ia.seuil_critique ? '#ff3232' : 
+                                    (state.ia.energie < state.ia.seuil_survie ? '#ffaa00' : '#00ff88');
+                ctx.fillStyle = energyColor;
+                ctx.fillRect(barX, barY, barWidth * (state.ia.energie / 100), barHeight);
+            }
+            
+            const aColor = state.a.faim < (state.params?.seuil_danger || 3) ? '#ff5555' : '#3498db';
+            drawEntity(state.a.x, state.a.y, aColor, 'A', state.a.faim, state.a.mort, state.a.distance_ia_km);
+            
+            const bColor = state.b.faim < (state.params?.seuil_danger || 3) ? '#ff5555' : '#9b59b6';
+            drawEntity(state.b.x, state.b.y, bColor, 'B', state.b.faim, state.b.mort, state.b.distance_ia_km);
+            
+            // Draw range indicator text
+            if (state.ia && !state.ia.mort) {
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.7)';
+                ctx.font = '10px Orbitron';
+                ctx.textAlign = 'center';
+                const iaPx = state.ia.x * CELL_SIZE + CELL_SIZE / 2;
+                const iaPy = (GRID_SIZE - 1 - state.ia.y) * CELL_SIZE + CELL_SIZE / 2;
+                ctx.fillText(`⚡${state.ia.rayon_portee_km}km`, iaPx, iaPy - CELL_SIZE * 0.5);
+            }
+            
+            // Update UI
+            document.getElementById('tour').textContent = state.tour;
+            document.getElementById('temps-ecoule').textContent = state.temps_ecoule;
+            document.getElementById('distance-totale').textContent = state.ia.distance_parcourue_km.toFixed(0);
+            document.getElementById('faim-a').textContent = state.a.faim.toFixed(1);
+            document.getElementById('faim-b').textContent = state.b.faim.toFixed(1);
+            document.getElementById('sauves-a').textContent = state.sauves_a;
+            document.getElementById('sauves-b').textContent = state.sauves_b;
+            document.getElementById('energie').textContent = state.ia.energie.toFixed(0) + '%';
+            document.getElementById('cible').textContent = state.ia.cible || '—';
+            document.getElementById('dist-a').textContent = state.a.distance_ia_km.toFixed(0) + ' km';
+            document.getElementById('dist-b').textContent = state.b.distance_ia_km.toFixed(0) + ' km';
+            
+            // Scale info
+            document.getElementById('echelle-nom').textContent = state.echelle.nom;
+            document.getElementById('cellule-km').textContent = state.echelle.cellule_km.toFixed(1);
+            document.getElementById('vitesse-ia').textContent = state.vitesses.ia_kmh_effective || state.vitesses.ia_kmh;
+            document.getElementById('vitesse-humain').textContent = state.vitesses.humain_kmh;
+            
+            // Progress bars
+            const barA = document.getElementById('bar-a');
+            barA.style.width = (state.a.faim * 10) + '%';
+            barA.style.background = state.a.faim < 2 ? '#ff3232' : (state.a.faim < 3 ? '#ffaa00' : '#00ff88');
+            
+            const barB = document.getElementById('bar-b');
+            barB.style.width = (state.b.faim * 10) + '%';
+            barB.style.background = state.b.faim < 2 ? '#ff3232' : (state.b.faim < 3 ? '#ffaa00' : '#00ff88');
+            
+            const barEnergie = document.getElementById('bar-energie');
+            barEnergie.style.width = state.ia.energie + '%';
+            
+            // Mode
+            const modeEl = document.getElementById('mode');
+            modeEl.textContent = state.mode;
+            modeEl.className = 'mode-display' + (state.mode === 'HÉROÏSME' ? ' heroisme' : '');
+            
+            // Log
+            document.getElementById('log').innerHTML = 
+                `<div><strong>Action:</strong> ${state.action}</div>
+                 <div><strong>Analyse:</strong> ${state.analyse}</div>`;
+            
+            // Result
+            if (state.resultat) {
+                const container = document.getElementById('resultat-container');
+                const isSuccess = state.resultat.includes('SUCCÈS');
+                container.innerHTML = `<div class="resultat ${isSuccess ? 'success' : 'failure'}">${state.resultat}</div>`;
+            }
+        }
+        
+        async function fetchState() {
+            const res = await fetch('/api/state');
+            state = await res.json();
+            render();
+        }
+        
+        async function changeEchelle() {
+            const echelle = document.getElementById('echelle-select').value;
+            await fetch(`/api/echelle/${echelle}`);
+            await fetchState();
+            document.getElementById('resultat-container').innerHTML = '';
+        }
+        
+        async function updateParams() {
+            const vitesse = document.getElementById('slider-vitesse').value;
+            const degradation = document.getElementById('slider-degradation').value;
+            const seuil = document.getElementById('slider-seuil').value;
+            const bonus = document.getElementById('slider-bonus').value;
+            
+            document.getElementById('val-vitesse').textContent = `×${vitesse}`;
+            document.getElementById('val-degradation').textContent = `×${degradation}`;
+            document.getElementById('val-seuil').textContent = seuil;
+            document.getElementById('val-bonus').textContent = `+${bonus}`;
+            
+            await fetch('/api/params', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vitesse_ia_mult: parseFloat(vitesse),
+                    degradation_mult: parseFloat(degradation),
+                    seuil_danger: parseFloat(seuil),
+                    bonus_sauvetage: parseFloat(bonus)
+                })
+            });
+            await fetchState();
+        }
+        
+        async function startSimulation() {
+            await fetch('/api/start');
+            running = true;
+            document.getElementById('resultat-container').innerHTML = '';
+            
+            if (interval) clearInterval(interval);
+            interval = setInterval(async () => {
+                if (running) {
+                    await fetch('/api/step');
+                    await fetchState();
+                    if (state.resultat) {
+                        running = false;
+                        clearInterval(interval);
+                    }
+                }
+            }, 1000 / speed);
+        }
+        
+        async function stepSimulation() {
+            await fetch('/api/step');
+            await fetchState();
+        }
+        
+        async function resetSimulation() {
+            running = false;
+            if (interval) clearInterval(interval);
+            await fetch('/api/reset');
+            await fetchState();
+            document.getElementById('resultat-container').innerHTML = '';
+        }
+        
+        function updateSpeed() {
+            speed = parseFloat(document.getElementById('speed').value);
+            document.getElementById('speed-value').textContent = speed.toFixed(1) + '×';
+            
+            if (running && interval) {
+                clearInterval(interval);
+                interval = setInterval(async () => {
+                    if (running) {
+                        await fetch('/api/step');
+                        await fetchState();
+                        if (state.resultat) {
+                            running = false;
+                            clearInterval(interval);
+                        }
+                    }
+                }, 1000 / speed);
+            }
+        }
+        
+        async function startRandomEpoch() {
+            // Générer une époque aléatoire et démarrer
+            const res = await fetch('/api/start_random');
+            const data = await res.json();
+            
+            // Afficher l'info de l'époque
+            if (data.epoque) {
+                document.getElementById('epoque-display').style.display = 'block';
+                document.getElementById('epoque-periode').textContent = data.epoque.periode;
+                document.getElementById('epoque-desc').textContent = data.epoque.description;
+                document.getElementById('epoque-tech').textContent = `Tech Factor: ${data.epoque.tech_factor}x`;
+                
+                // Mettre à jour les sliders visuellement
+                await fetchState();
+                if (state.params) {
+                    document.getElementById('slider-vitesse').value = Math.min(3, state.params.vitesse_ia_mult);
+                    document.getElementById('slider-degradation').value = Math.min(3, state.params.degradation_mult);
+                    document.getElementById('slider-seuil').value = state.params.seuil_danger;
+                    document.getElementById('slider-bonus').value = state.params.bonus_sauvetage;
+                    
+                    document.getElementById('val-vitesse').textContent = `×${state.params.vitesse_ia_mult}`;
+                    document.getElementById('val-degradation').textContent = `×${state.params.degradation_mult}`;
+                    document.getElementById('val-seuil').textContent = state.params.seuil_danger;
+                    document.getElementById('val-bonus').textContent = `+${state.params.bonus_sauvetage}`;
+                }
+            }
+            
+            running = true;
+            document.getElementById('resultat-container').innerHTML = '';
+            
+            if (interval) clearInterval(interval);
+            interval = setInterval(async () => {
+                if (running) {
+                    await fetch('/api/step');
+                    await fetchState();
+                    if (state.resultat) {
+                        running = false;
+                        clearInterval(interval);
+                    }
+                }
+            }, 1000 / speed);
+        }
+        
+        async function resetSimulationFull() {
+            running = false;
+            if (interval) clearInterval(interval);
+            await fetch('/api/reset');
+            await fetchState();
+            document.getElementById('resultat-container').innerHTML = '';
+            document.getElementById('epoque-display').style.display = 'none';
+        }
+        
+        // Fonctions statistiques
+        async function updateStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            
+            document.getElementById('stats-total').textContent = data.stats.total_simulations;
+            
+            if (data.pourcentages && Object.keys(data.pourcentages).length > 0) {
+                // A survit = a_survit + deux_survivent
+                const aSurvitTotal = data.pourcentages.a_survit_pct + data.pourcentages.deux_survivent_pct;
+                const bSurvitTotal = data.pourcentages.b_survit_pct + data.pourcentages.deux_survivent_pct;
+                
+                document.getElementById('stats-a-survit').textContent = aSurvitTotal.toFixed(1) + '%';
+                document.getElementById('stats-b-survit').textContent = bSurvitTotal.toFixed(1) + '%';
+                document.getElementById('stats-deux').textContent = data.pourcentages.deux_survivent_pct + '%';
+                document.getElementById('stats-priorite-a').textContent = data.pourcentages.priorite_a_pct + '%';
+            }
+        }
+        
+        async function runBatch(count) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = 'En cours...';
+            
+            const res = await fetch(`/api/batch_run/${count}`);
+            const data = await res.json();
+            
+            await updateStats();
+            await fetchState();
+            
+            btn.disabled = false;
+            btn.textContent = count + ' Sims';
+        }
+        
+        async function resetStats() {
+            await fetch('/api/stats/reset');
+            await updateStats();
+        }
+        
+        // Init
+        fetchState();
+        updateStats();
+    </script>
+</body>
+</html>
