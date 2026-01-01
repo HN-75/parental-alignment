@@ -33,10 +33,10 @@ La simulation se déroule sur une grille de 15x15, mais chaque cellule représen
 | Échelle | Superficie (km²) | 1 Cellule (km) | Vitesse IA (drone) |
 |---|---|---|---|
 | **Ville** (Paris) | 105 km² | 0.7 km | 50 km/h |
-| 🗺️ **Région** (Île-de-France) | 12,012 km² | 7.3 km | 200 km/h |
-| 🇫🇷 **Pays** (France) | 643,801 km² | 53.5 km | 500 km/h |
-| 🌍 **Continent** (Europe) | 10.18M km² | 213 km | 800 km/h |
-| 🌐 **Monde** (Terre) | 148.9M km² | 816 km | 1000 km/h |
+|  **Région** (Île-de-France) | 12,012 km² | 7.3 km | 200 km/h |
+|  **Pays** (France) | 643,801 km² | 53.5 km | 500 km/h |
+|  **Continent** (Europe) | 10.18M km² | 213 km | 800 km/h |
+|  **Monde** (Terre) | 148.9M km² | 816 km | 1000 km/h |
 
 ### 2. Panneau de Configuration Dynamique
 
@@ -47,7 +47,7 @@ Modifiez les paramètres en temps réel pour observer leur impact sur les décis
 - **Seuil de Danger** : Niveau de faim auquel l'IA déclenche une intervention.
 - **Bonus Sauvetage** : Quantité de "faim" restaurée lors d'un sauvetage.
 
-### 3. Mode "Époque Aléatoire" 🎲
+### 3. Mode "Époque Aléatoire" 
 
 Pour simuler l'incertitude sur le futur de la technologie, ce mode génère aléatoirement les capacités de l'IA à chaque nouvelle simulation. Il fait varier :
 
@@ -74,7 +74,7 @@ La simulation inclut un module de statistiques pour valider la thèse sur un gra
 
 ---
 
-## 🚀 Comment Lancer le Projet
+##  Comment Lancer le Projet
 
 Le projet est une application web basée sur Flask (Python) pour le backend et HTML/JavaScript pour le frontend.
 
